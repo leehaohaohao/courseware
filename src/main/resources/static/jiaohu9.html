@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Box Model</title>
+  <script src="polty.js"></script>
+</head>
+<body style="height: 100vh; width: 100vw;">
+  <div id="3d-box" style="height: 100%; width: 100%;"></div>
+
+  <script>
+    var data = [{
+      type: 'mesh3d',
+      x: [0, 1, 1, 0, 0, 1, 1, 0],
+      y: [0, 0, 1, 1, 0, 0, 1, 1],
+      z: [0, 0, 0, 0, 1, 1, 1, 1],
+      i: [0, 0, 0, 4, 4, 4, 4, 4, 1, 2, 3, 0, 5, 6, 7],
+      j: [1, 2, 3, 5, 6, 7, 6, 5, 2, 3, 1, 5, 6, 7, 4],
+      k: [2, 3, 0, 6, 7, 4, 5, 1, 5, 6, 7, 2, 3, 0, 1],
+      opacity: 0.6,
+      color: 'rgba(55,128,191,0.6)'
+    }];
+
+    var layout = {
+      margin: {
+        l: 0,
+        r: 0,
+        b: 0,
+        t: 0
+      }
+    };
+
+    Plotly.newPlot('3d-box', data, layout);
+  </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.CommentMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.Comment">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="userId" column="user_id"/>
+        <result property="time" column="time"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,content,user_id,time
+    </sql>
+    <sql id="base_query_condition">
+        <where>
+            <if test="query.id != null">
+                and id = #{query.id}
+            </if>
+            <if test="query.content != null and query.content!=''">
+                and content = #{query.content}
+            </if>
+            <if test="query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+        </where>
+    </sql>
+    <select id="selectList" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from comment
+        <include refid="base_query_condition"/>
+    </select>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.Comment">
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.content != null">
+                content,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.time != null">
+                time,
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                #{bean.id},
+            </if>
+            <if test="bean.content != null">
+                #{bean.content},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.time != null">
+                #{bean.time},
+            </if>
+        </trim>
+    </insert>
+</mapper>

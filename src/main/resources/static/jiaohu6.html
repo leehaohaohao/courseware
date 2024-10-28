@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Geometric Model</title>
+    <script src="polty.js"></script>
+</head>
+<body style="height: 100vh; width: 100vw;">
+    <div id="plot" style="height: 100%; width: 100%;"></div>
+
+    <script>
+        var data = [{
+            type: 'scatter3d',
+            mode: 'lines',
+            x: [0, 0, 0, 1, 1, 1, 1, 0, 0, 1],
+            y: [0, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+            z: [0, 0, 1, 0, 0, 1, 1, 1, 1, 1],
+            line: {
+                width: 2,
+                color: 'black',
+                dash: 'dashdot'
+            }
+        }];
+
+        var layout = {
+            margin: {
+                l: 0,
+                r: 0,
+                b: 0,
+                t: 0
+            },
+            scene: {
+                aspectmode: 'cube',
+                xaxis: {range: [0, 1]},
+                yaxis: {range: [0, 1]},
+                zaxis: {range: [0, 1]}
+            }
+        };
+
+        Plotly.newPlot('plot', data, layout);
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.HotPostMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.HotPost">
+        <id column="id" property="id"/>
+        <result column="img" property="img"/>
+        <result column="title" property="title"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comments_count" property="commentsCount"/>
+        <result column="time" property="time"/>
+        <result column="is_like" property="isLike"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,img,title,sub_title,view_count,like_count,time,is_like,comments_count
+    </sql>
+    <select id="selectList" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from hot_post
+    </select>
+</mapper>

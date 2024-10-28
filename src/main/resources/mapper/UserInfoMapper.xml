@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.UserInfoMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.UserInfo">
+        <id column="user_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="classname" property="classname"/>
+        <result column="password" property="password"/>
+        <result column="avatar" property="avatar"/>
+        <result column="identity" property="identity"/>
+        <result column="task" property="task"/>
+        <result column="ntask" property="ntask"/>
+        <result column="discuss" property="discuss"/>
+        <result column="study" property="study"/>
+        <result column="day" property="day"/>
+    </resultMap>
+    <sql id="base_column_list">
+        user_id,name,classname,password,avatar,identity,task,ntask,discuss,study,day
+    </sql>
+    <sql id="base_query_condition">
+        <where>
+            <if test="query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+            <if test="query.name != null and query.name!=''">
+                and name = #{query.name}
+            </if>
+            <if test="query.classname != null and query.classname!=''">
+                and classname = #{query.classname}
+            </if>
+            <if test="query.identity != null">
+                and identity = #{query.identity}
+            </if>
+        </where>
+    </sql>
+    <select id="selectById" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from user_info
+        <include refid="base_query_condition"/>
+    </select>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.UserInfo">
+        insert into user_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.name != null">
+                name,
+            </if>
+            <if test="bean.classname != null">
+                classname,
+            </if>
+            <if test="bean.password != null">
+                password,
+            </if>
+            <if test="bean.avatar != null">
+                avatar,
+            </if>
+            <if test="bean.identity != null">
+                identity,
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.name != null">
+                #{bean.name},
+            </if>
+            <if test="bean.classname != null">
+                #{bean.classname},
+            </if>
+            <if test="bean.password != null">
+                #{bean.password},
+            </if>
+            <if test="bean.avatar !=null">
+                #{bean.avatar},
+            </if>
+            <if test="bean.identity != null">
+                #{bean.identity},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectAllId" resultMap="base_result_map">
+        select user_id from user_info
+        where identity = 1
+    </select>
+    <select id="selectList" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from user_info
+        <include refid="base_query_condition"/>
+        <if test="query.orderBy != null">
+            order by ${query.orderBy}
+        </if>
+    </select>
+</mapper>

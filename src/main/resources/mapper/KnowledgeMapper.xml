@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.KnowledgeMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.Knowledge">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="init" property="init"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,content,init,user_id
+    </sql>
+    <select id="selectById" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from knowledge
+        where user_id = #{userId} and id = #{id}
+    </select>
+    <update id="updateById">
+        update knowledge
+        <set>
+            <if test="query.content!=null and query.content!=''">
+                content = #{query.content},
+            </if>
+            <if test="query.init!=null and query.init!=''">
+                init = #{query.init},
+            </if>
+        </set>
+        where user_id = #{query.userId} and id = #{id}
+    </update>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.Knowledge">
+        insert into knowledge (id,content,init,user_id)
+        values (#{bean.id},#{bean.content},#{bean.init},#{bean.userId})
+    </insert>
+    <update id="updateK">
+        update knowledge
+        <set>
+            <if test="query.content!=null and query.content!=''">
+                content = #{query.content},
+            </if>
+            <if test="query.init!=null and query.init!=''">
+                init = #{query.init},
+            </if>
+        </set>
+        where id = #{query.id}
+    </update>
+</mapper>

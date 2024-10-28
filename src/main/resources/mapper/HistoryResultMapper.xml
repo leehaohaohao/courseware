@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.HistoryResultMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.HistoryResult">
+        <id property="id" column="id"/>
+        <result property="mistake" column="mistake"/>
+        <result property="pId" column="p_id"/>
+        <result property="tId" column="t_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,mistake,p_id,t_id,user_id
+    </sql>
+    <sql id="base_query_condition">
+        <where>
+            <if test="query.id != null">
+                and id = #{query.id}
+            </if>
+            <if test="query.mistake != null">
+                and mistake = #{query.mistake}
+            </if>
+            <if test="query.pId != null">
+                and p_id = #{query.pId}
+            </if>
+            <if test="query.tId != null">
+                and t_id = #{query.tId}
+            </if>
+            <if test="query.userId != null">
+                and user_id = #{query.userId}
+            </if>
+        </where>
+    </sql>
+    <select id="selectByUserId" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from history_result
+        <include refid="base_query_condition"/>
+    </select>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.HistoryResult">
+            insert into history_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.mistake != null">
+                mistake,
+            </if>
+            <if test="bean.pId != null">
+                p_id,
+            </if>
+            <if test="bean.tId != null">
+                t_id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                #{bean.id},
+            </if>
+            <if test="bean.mistake != null">
+                #{bean.mistake},
+            </if>
+            <if test="bean.pId != null">
+                #{bean.pId},
+            </if>
+            <if test="bean.tId != null">
+                #{bean.tId},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+        </trim>
+    </insert>
+</mapper>

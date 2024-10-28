@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.KnowledgeTestMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.KnowledgeTest">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="done" property="done"/>
+        <result column="answer" property="answer"/>
+        <result column="sheet" property="sheet"/>
+        <result column="analysis" property="analysis"/>
+        <result column="question" property="question"/>
+        <result column="type" property="type"/>
+        <result column="ans" property="ans"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,user_id,done,answer,sheet,analysis,question,type,ans
+    </sql>
+    <sql id="base_query_condition">
+        <where>
+            <if test="query.id!=null">
+                and id = #{query.id}
+            </if>
+            <if test="query.userId!=null">
+                and user_id = #{query.userId}
+            </if>
+            <if test="query.done!=null">
+                and done = #{query.done}
+            </if>
+            <if test="query.answer!=null and query.answer !=''">
+                and answer = #{query.answer}
+            </if>
+            <if test="query.sheet!=null and query.sheet !=''">
+                and sheet = #{query.sheet}
+            </if>
+            <if test="query.analysis!=null and query.analysis !=''">
+                and analysis = #{query.analysis}
+            </if>
+            <if test="query.question!=null and query.question !=''">
+                and question = #{query.question}
+            </if>
+            <if test="query.type!=null">
+                and type = #{query.type}
+            </if>
+            <if test="query.ans!=null and query.ans !=''">
+                and ans = #{query.ans}
+            </if>
+        </where>
+    </sql>
+    <update id="update">
+        update knowledge_test
+        <set>
+            <if test="bean.id!=null">
+                id = #{bean.id},
+            </if>
+            <if test="bean.userId!=null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.done!=null">
+                done = #{bean.done},
+            </if>
+            <if test="bean.answer!=null and bean.answer !=''">
+                answer = #{bean.answer},
+            </if>
+            <if test="bean.sheet!=null and bean.sheet !=''">
+                sheet = #{bean.sheet},
+            </if>
+            <if test="bean.analysis!=null and bean.analysis !=''">
+                analysis = #{bean.analysis},
+            </if>
+            <if test="bean.question!=null and bean.question !=''">
+                question = #{bean.question},
+            </if>
+            <if test="bean.type!=null">
+                type = #{bean.type},
+            </if>
+            <if test="bean.ans!=null and bean.ans !=''">
+                ans = #{bean.ans},
+            </if>
+        </set>
+        <include refid="base_query_condition"/>
+    </update>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.KnowledgeTest">
+        INSERT INTO knowledge_test
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.done != null">
+                done,
+            </if>
+            <if test="bean.answer != null">
+                answer,
+            </if>
+            <if test="bean.sheet != null">
+                sheet,
+            </if>
+            <if test="bean.analysis != null">
+                analysis,
+            </if>
+            <if test="bean.question != null">
+                question,
+            </if>
+            <if test="bean.type != null">
+                type,
+            </if>
+            <if test="bean.ans != null">
+                ans,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="bean.id != null">
+                #{bean.id},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.done != null">
+                #{bean.done},
+            </if>
+            <if test="bean.answer != null">
+                #{bean.answer},
+            </if>
+            <if test="bean.sheet != null">
+                #{bean.sheet},
+            </if>
+            <if test="bean.analysis != null">
+                #{bean.analysis},
+            </if>
+            <if test="bean.question != null">
+                #{bean.question},
+            </if>
+            <if test="bean.type != null">
+                #{bean.type},
+            </if>
+            <if test="bean.ans != null">
+                #{bean.ans},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectById" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from knowledge_test
+        <include refid="base_query_condition"/>
+    </select>
+</mapper>

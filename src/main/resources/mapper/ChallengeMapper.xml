@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.ChallengeMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.Challenge">
+        <id column="id" property="id"/>
+        <result column="img" property="img"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,img
+    </sql>
+    <select id="selectList" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from challenge
+    </select>
+</mapper>

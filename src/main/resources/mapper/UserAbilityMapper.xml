@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.UserAbilityMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.UserAbility">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="aId" column="a_id"/>
+        <result property="score" column="score"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,user_id,a_id,score
+    </sql>
+    <select id="selectByUserIdByAbilityId" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from user_ability
+        where user_id = #{userId} and a_id = #{aId}
+    </select>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.UserAbility">
+        insert into user_ability
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.aId != null">
+                a_id,
+            </if>
+            <if test="bean.score != null">
+                score,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                #{bean.id},
+            </if>
+            <if test="bean.userId != null">
+                #{bean.userId},
+            </if>
+            <if test="bean.aId != null">
+                #{bean.aId},
+            </if>
+            <if test="bean.score != null">
+                #{bean.score},
+            </if>
+        </trim>
+    </insert>
+</mapper>

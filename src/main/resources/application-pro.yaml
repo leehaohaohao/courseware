@@ -1,0 +1,6 @@
+file:
+  load:
+    path: ./model/
+url: http://localhost:8080/courseware/
+img:
+  path: ./model/img

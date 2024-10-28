@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.DiscussMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.Discuss">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="comment_time" property="commentTime"/>
+    </resultMap>
+    <resultMap id="dto_result_map" type="com.lihao.courseware.entity.dto.DiscussDto">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,user_id,title,content,time,comment_time
+    </sql>
+    <sql id="dto_column_list">
+        id,title,content,time
+    </sql>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.Discuss">
+        insert into discuss (id,user_id,title,content,time,comment_time)
+        values (#{bean.id},#{bean.userId},#{bean.title},#{bean.content},#{bean.time},#{bean.commentTime})
+    </insert>
+    <sql id="query_condition">
+        <where>
+            <if test="query.id !=null and query.id!=''">
+                and id = #{query.id}
+            </if>
+            <if test="query.title !=null and query.title!=''">
+                and title = #{query.title}
+            </if>
+            <if test="query.content !=null and query.content!=''">
+                and content = #{query.content}
+            </if>
+        </where>
+    </sql>
+    <select id="selectList" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from discuss
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.page!=null">
+            limit #{query.page.left},#{query.page.right}
+        </if>
+    </select>
+</mapper>

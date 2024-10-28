@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.HistoryPointMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.HistoryPoint">
+        <id property="id" column="id"/>
+        <result property="point" column="point"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,point
+    </sql>
+    <sql id="base_query_condition">
+        <where>
+            <if test="query.id != null">
+                and id = #{query.id}
+            </if>
+            <if test="query.point != null and query.point != ''">
+                and point = #{query.point}
+            </if>
+        </where>
+    </sql>
+    <select id="selectById" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from history_point
+        where id = #{id}
+    </select>
+    <select id="selectAllId" resultMap="base_result_map">
+        select <include refid="base_column_list"/> from history_point
+    </select>
+</mapper>

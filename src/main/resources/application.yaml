@@ -1,0 +1,51 @@
+server:
+  port: 10001
+  servlet:
+    context-path: /courseware
+    session:
+      timeout: 30m
+  tomcat:
+    connection-timeout: 5000
+ws:
+  port: 10002
+  client:
+    port: 10003
+    #host: localhost
+    host: 121.40.154.188
+    path: ws://${ws.client.host}:${ws.port}/ws
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.lihao.courseware.entity
+  configuration:
+    map-underscore-to-camel-case: true
+spring:
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 25
+  profiles:
+    active: dev
+  config:
+    import: database-pro.yaml
+  jackson:
+    default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  ai:
+    openai:
+      api-key: sk-l0VCv1A4zjjUqXdnwesKlxZNdS6PCKMIgqVaKPztdYgasY5O
+      base-url: https://api.chatanywhere.com.cn
+      chat:
+        options:
+          model: gpt-3.5-turbo
+          temperature: 0.3F
+logging:
+  level:
+    root: info
+img:
+  uri: http://121.40.154.188:10001/courseware/
+  #uri: http://localhost:10001/courseware/

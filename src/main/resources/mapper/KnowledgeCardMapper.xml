@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.KnowledgeCardMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.KnowledgeCard">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,title,content,time,user_id
+    </sql>
+    <select id="selectListById" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+            from knowledge_card
+        where user_id = #{userId}
+    </select>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.KnowledgeCard">
+        insert into knowledge_card(user_id,title,content,time)
+        values (#{query.userId},#{query.title},#{query.content},#{query.time})
+    </insert>
+</mapper>

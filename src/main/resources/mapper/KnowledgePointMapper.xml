@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lihao.courseware.mapper.KnowledgePointMapper">
+    <resultMap id="base_result_map" type="com.lihao.courseware.entity.po.KnowledgePoint">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="judge" property="judge"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    <sql id="base_column_list">
+        id,title,content,judge,user_id
+    </sql>
+    <select id="selectById" resultMap="base_result_map">
+        select <include refid="base_column_list"/>
+        from knowledge_point
+        where user_id = #{userId} and id = #{id}
+    </select>
+    <update id="updateById">
+        update knowledge_point
+        <set>
+            <if test="query.title!=null and query.title!=''">
+                title = #{query.title},
+            </if>
+            <if test="query.content!=null and query.content!=''">
+                content = #{query.content},
+            </if>
+            <if test="query.judge!=null">
+                judge = #{query.judge},
+            </if>
+        </set>
+        where user_id = #{query.userId} and id = #{id}
+    </update>
+    <insert id="insert" parameterType="com.lihao.courseware.entity.po.KnowledgePoint">
+        insert into knowledge_point (id,content,title,judge,user_id)
+        values(#{bean.id},#{bean.content},#{bean.title},#{bean.judge},#{bean.userId})
+    </insert>
+    <update id="updateP">
+        update knowledge_point
+        <set>
+            <if test="query.title!=null and query.title!=''">
+                title = #{query.title},
+            </if>
+            <if test="query.content!=null and query.content!=''">
+                content = #{query.content},
+            </if>
+            <if test="query.judge!=null">
+                judge = #{query.judge},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

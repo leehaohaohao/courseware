@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Colored Cube</title>
+    <script src="polty.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #plot {
+            width: 80%;
+            height: 80%;
+        }
+    </style>
+</head>
+<body>
+<div id="plot"></div>
+
+<script>
+    var data = [{
+        type: 'mesh3d',
+        x: [0, 1, 1, 0, 0, 1, 1, 0],
+        y: [0, 0, 1, 1, 0, 0, 1, 1],
+        z: [0, 0, 0, 0, 1, 1, 1, 1],
+        i: [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7],
+        j: [1, 2, 3, 2, 3, 0, 3, 0, 1, 0, 1, 2, 5, 6, 7, 6, 7, 4, 7, 4, 5, 4, 5, 6],
+        k: [2, 3, 0, 3, 0, 1, 0, 1, 2, 1, 2, 3, 6, 7, 4, 7, 4, 5, 4, 5, 6, 5, 6, 7],
+        opacity: 0.6,
+        color: ['rgba(255, 0, 0, 0.8)', 'rgba(0, 255, 0, 0.8)', 'rgba(0, 0, 255, 0.8)', 'rgba(255, 255, 0, 0.8)', 'rgba(0, 255, 255, 0.8)', 'rgba(255, 0, 255, 0.8)'],
+        flatshading: true
+    }];
+
+    var layout = {
+        margin: { t: 0, l: 0, r: 0, b: 0 },
+        scene: {
+            xaxis: { title: 'X Axis', showgrid: true, zeroline: false },
+            yaxis: { title: 'Y Axis', showgrid: true, zeroline: false },
+            zaxis: { title: 'Z Axis', showgrid: true, zeroline: false }
+        }
+    };
+
+    Plotly.newPlot('plot', data, layout);
+</script>
+</body>
+</html>
