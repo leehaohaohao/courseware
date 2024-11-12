@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive 3D Rectangular Prism with Three.js</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: white;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #sliderContainer {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: '';
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196f3;
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sliderContainer">
+    <label class="switch">
+      <input type="checkbox" id="expandSlider" />
+      <span class="slider round"></span>
+    </label>
+    <span>展开长方体</span>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!--  <script src="../../javascript/three/three.min.js"></script>-->
+  <script>
+    // 创建场景
+    const scene = new THREE.Scene()
+
+    // 创建相机
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    )
+    camera.position.z = 10
+
+    // 创建渲染器
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setClearColor(0xffffff, 1) // 设置背景颜色为白色
+    document.body.appendChild(renderer.domElement)
+
+    // 创建几何体
+    const geometry = new THREE.BoxGeometry(6, 3, 3) // 更大的长方体
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      wireframe: true,
+      wireframeLinewidth: 2
+    })
+    const rectangularPrism = new THREE.Mesh(geometry, material)
+    scene.add(rectangularPrism)
+
+    // 添加交互
+    let isRotating = true
+    let isExpanded = false
+
+    document.getElementById('expandSlider').addEventListener('change', (event) => {
+      if (event.target.checked) {
+        // 先旋转到正面朝向
+        const targetRotationX = 0
+        const targetRotationY = 0
+        const rotationDuration = 1000 // 旋转动画持续时间（毫秒）
+        let rotationProgress = 0
+
+        function rotateToFront() {
+          if (rotationProgress < rotationDuration) {
+            rotationProgress += 16 // 假设每帧16毫秒
+            const t = rotationProgress / rotationDuration
+            rectangularPrism.rotation.x =
+              rectangularPrism.rotation.x * (1 - t) + targetRotationX * t
+            rectangularPrism.rotation.y =
+              rectangularPrism.rotation.y * (1 - t) + targetRotationY * t
+            requestAnimationFrame(rotateToFront)
+          } else {
+            // 旋转完成后手动调整角度
+            rectangularPrism.rotation.x = targetRotationX
+            rectangularPrism.rotation.y = targetRotationY
+            // 旋转完成后展开长方体
+            unfoldRectangularPrism()
+          }
+        }
+
+        function unfoldRectangularPrism() {
+          isRotating = false // 停止旋转
+          rectangularPrism.geometry.dispose()
+          const vertices = new Float32Array([
+            // Front face
+            -3, -1.5, 1.5, 3, -1.5, 1.5, 3, 1.5, 1.5, -3, 1.5, 1.5,
+            // Back face
+            -3, -1.5, -1.5, -3, 1.5, -1.5, 3, 1.5, -1.5, 3, -1.5, -1.5,
+            // Top face
+            -3, 1.5, -1.5, -3, 1.5, 1.5, 3, 1.5, 1.5, 3, 1.5, -1.5,
+            // Bottom face
+            -3, -1.5, -1.5, 3, -1.5, -1.5, 3, -1.5, 1.5, -3, -1.5, 1.5,
+            // Right face
+            3, -1.5, -1.5, 3, 1.5, -1.5, 3, 1.5, 1.5, 3, -1.5, 1.5,
+            // Left face
+            -3, -1.5, -1.5, -3, -1.5, 1.5, -3, 1.5, 1.5, -3, 1.5, -1.5
+          ])
+          const indices = [
+            0,
+            1,
+            2,
+            0,
+            2,
+            3, // front
+            4,
+            5,
+            6,
+            4,
+            6,
+            7, // back
+            8,
+            9,
+            10,
+            8,
+            10,
+            11, // top
+            12,
+            13,
+            14,
+            12,
+            14,
+            15, // bottom
+            16,
+            17,
+            18,
+            16,
+            18,
+            19, // right
+            20,
+            21,
+            22,
+            20,
+            22,
+            23 // left
+          ]
+          const bufferGeometry = new THREE.BufferGeometry()
+          bufferGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+          bufferGeometry.setIndex(indices)
+          rectangularPrism.geometry = bufferGeometry
+
+          // 展开动画
+          const unfoldVertices = new Float32Array([
+            // Front face
+            -9, -1.5, 0, -3, -1.5, 0, -3, 1.5, 0, -9, 1.5, 0,
+            // Back face
+            3, -1.5, 0, 3, 1.5, 0, 9, 1.5, 0, 9, -1.5, 0,
+            // Top face
+            -3, 1.5, 0, -3, 4.5, 0, 3, 4.5, 0, 3, 1.5, 0,
+            // Bottom face
+            -3, -4.5, 0, 3, -4.5, 0, 3, -1.5, 0, -3, -1.5, 0,
+            // Right face
+            3, -1.5, 0, 3, 1.5, 0, 9, 1.5, 0, 9, -1.5, 0,
+            // Left face
+            -9, -1.5, 0, -9, 1.5, 0, -3, 1.5, 0, -3, -1.5, 0
+          ])
+
+          let progress = 0
+          const unfoldDuration = 1000 // 展开动画持续时间（毫秒）
+
+          function unfoldAnimation() {
+            if (progress < unfoldDuration) {
+              progress += 16 // 假设每帧16毫秒
+              const t = progress / unfoldDuration
+              for (let i = 0; i < vertices.length; i++) {
+                vertices[i] = vertices[i] * (1 - t) + unfoldVertices[i] * t
+              }
+              bufferGeometry.attributes.position.needsUpdate = true
+              requestAnimationFrame(unfoldAnimation)
+            } else {
+              // 展开完成后停止旋转并调整相机位置
+              camera.position.set(0, 0, 15)
+              camera.lookAt(0, 0, 0)
+            }
+          }
+
+          unfoldAnimation()
+        }
+
+        rotateToFront()
+      } else {
+        // 收回长方体
+        rectangularPrism.geometry.dispose()
+        rectangularPrism.geometry = new THREE.BoxGeometry(6, 3, 3)
+        camera.position.set(0, 0, 10)
+        camera.lookAt(0, 0, 0)
+        isRotating = true // 恢复旋转
+      }
+      isExpanded = !isExpanded
+    })
+
+    // 渲染循环
+    function animate() {
+      requestAnimationFrame(animate)
+
+      if (isRotating) {
+        rectangularPrism.rotation.x += 0.01
+        rectangularPrism.rotation.y += 0.01
+      }
+
+      renderer.render(scene, camera)
+    }
+
+    animate()
+  </script>
+</body>
+
+</html>

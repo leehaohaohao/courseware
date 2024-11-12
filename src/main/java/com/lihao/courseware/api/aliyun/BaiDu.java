@@ -29,7 +29,7 @@ public class BaiDu {
     private HashMap<String,Long> urlMap = new HashMap<>();
     private Random random;
     //121.40.154.188
-    private String ip = "localhost";
+    private String ip = "121.40.154.188";
     @PostConstruct
     private void init(){
         String[] urls = {"http://"+ip+":10001/courseware/jiaohu.html",

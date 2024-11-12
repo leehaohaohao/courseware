@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>增强的高中立体几何交互</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    #controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    button {
+      border-radius: 16px;
+      padding: 5px 10px;
+    }
+  </style>
+  <!--  <script src="../../javascript/three/three.min.js"></script>-->
+</head>
+
+<body>
+  <div id="info">点击几何体查看属性</div>
+  <div id="controls">
+    <label for="shape">形状:</label>
+    <select id="shape">
+      <option value="cube">立方体</option>
+      <option value="cylinder">圆柱体</option>
+      <option value="cone">圆锥体</option>
+      <option value="sphere">球体</option>
+      <option value="pyramid">棱锥体</option>
+      <option value="torus">圆环体</option>
+      <option value="ellipsoid">椭球体</option>
+    </select>
+    <br />
+    <label for="size">大小:</label>
+    <input type="number" id="size" value="1" step="0.1" />
+    <br />
+    <button id="addShape">添加形状</button>
+    <button id="clearShapes">清除所有形状</button>
+    <button id="toggleRotation">切换旋转</button>
+  </div>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js';
+    // 创建场景
+    const scene = new THREE.Scene()
+
+    // 创建相机
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    )
+    camera.position.z = 10
+
+    // 创建渲染器
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    // 创建光源
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+    scene.add(ambientLight)
+
+    const pointLight = new THREE.PointLight(0xffffff, 1)
+    pointLight.position.set(5, 5, 5)
+    scene.add(pointLight)
+
+    // 创建几何图形
+    const shapes = []
+    let autoRotate = false
+
+    function createShape(type, size) {
+      let geometry
+      switch (type) {
+        case 'cube':
+          geometry = new THREE.BoxGeometry(size, size, size)
+          break
+        case 'cylinder':
+          geometry = new THREE.CylinderGeometry(size, size, size * 2, 32)
+          break
+        case 'cone':
+          geometry = new THREE.ConeGeometry(size, size * 2, 32)
+          break
+        case 'sphere':
+          geometry = new THREE.SphereGeometry(size, 32, 32)
+          break
+        case 'pyramid':
+          geometry = new THREE.ConeGeometry(size, size * 2, 4)
+          break
+        case 'torus':
+          geometry = new THREE.TorusGeometry(size, size / 2, 16, 100)
+          break
+        case 'ellipsoid':
+          geometry = new THREE.SphereGeometry(size, 32, 32)
+          geometry.scale(1, 1.5, 1)
+          break
+      }
+      const material = new THREE.MeshStandardMaterial({
+        color: Math.random() * 0xffffff,
+        flatShading: true
+      })
+      const mesh = new THREE.Mesh(geometry, material)
+      mesh.position.x = (Math.random() - 0.5) * 10
+      mesh.position.y = (Math.random() - 0.5) * 10
+      scene.add(mesh)
+      shapes.push(mesh)
+    }
+
+    document.getElementById('addShape').addEventListener('click', () => {
+      const shape = document.getElementById('shape').value
+      const size = parseFloat(document.getElementById('size').value)
+      createShape(shape, size)
+    })
+
+    document.getElementById('clearShapes').addEventListener('click', () => {
+      shapes.forEach((shape) => scene.remove(shape))
+      shapes.length = 0
+    })
+
+    document.getElementById('toggleRotation').addEventListener('click', () => {
+      autoRotate = !autoRotate
+    })
+
+    // 创建粒子系统
+    const particlesGeometry = new THREE.BufferGeometry()
+    const particlesCount = 5000
+    const posArray = new Float32Array(particlesCount * 3)
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 50
+    }
+
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3))
+
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.05,
+      color: 0xffffff
+    })
+
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial)
+    scene.add(particlesMesh)
+
+    // 监听鼠标事件
+    let isMouseDown = false
+    let isRightMouseDown = false
+    let startX, startY
+    let selectedObject = null
+
+    document.addEventListener('mousedown', (event) => {
+      if (event.button === 0) {
+        isMouseDown = true
+      } else if (event.button === 2) {
+        isRightMouseDown = true
+      }
+      startX = event.clientX
+      startY = event.clientY
+
+      const mouse = new THREE.Vector2()
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+      const raycaster = new THREE.Raycaster()
+      raycaster.setFromCamera(mouse, camera)
+
+      const intersects = raycaster.intersectObjects(shapes)
+
+      if (intersects.length > 0) {
+        selectedObject = intersects[0].object
+        displayProperties(selectedObject)
+      }
+    })
+
+    document.addEventListener('mouseup', (event) => {
+      if (event.button === 0) {
+        isMouseDown = false
+      } else if (event.button === 2) {
+        isRightMouseDown = false
+      }
+      selectedObject = null
+    })
+
+    document.addEventListener('mousemove', (event) => {
+      if (isMouseDown && selectedObject) {
+        const deltaX = event.clientX - startX
+        const deltaY = event.clientY - startY
+
+        selectedObject.position.x += deltaX * 0.01
+        selectedObject.position.y -= deltaY * 0.01
+
+        startX = event.clientX
+        startY = event.clientY
+      } else if (isRightMouseDown && selectedObject) {
+        const deltaX = event.clientX - startX
+        const deltaY = event.clientY - startY
+
+        selectedObject.rotation.y += deltaX * 0.01
+        selectedObject.rotation.x += deltaY * 0.01
+
+        startX = event.clientX
+        startY = event.clientY
+      }
+    })
+
+    document.addEventListener('wheel', (event) => {
+      camera.position.z += event.deltaY * 0.01
+    })
+
+    document.addEventListener('dblclick', (event) => {
+      const mouse = new THREE.Vector2()
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+      const raycaster = new THREE.Raycaster()
+      raycaster.setFromCamera(mouse, camera)
+
+      const intersects = raycaster.intersectObjects(shapes)
+
+      if (intersects.length > 0) {
+        const selectedObject = intersects[0].object
+        selectedObject.material.color.set(Math.random() * 0xffffff)
+      }
+    })
+
+    function displayProperties(object) {
+      const info = document.getElementById('info')
+      let properties = ''
+
+      if (object.geometry instanceof THREE.BoxGeometry) {
+        properties =
+          '形状: 立方体<br>体积: ' +
+          Math.pow(object.geometry.parameters.width, 3) +
+          '<br>表面积: ' +
+          6 * Math.pow(object.geometry.parameters.width, 2)
+      } else if (object.geometry instanceof THREE.CylinderGeometry) {
+        properties =
+          '形状: 圆柱体<br>体积: ' +
+          Math.PI *
+          Math.pow(object.geometry.parameters.radiusTop, 2) *
+          object.geometry.parameters.height +
+          '<br>表面积: ' +
+          2 *
+          Math.PI *
+          object.geometry.parameters.radiusTop *
+          (object.geometry.parameters.radiusTop + object.geometry.parameters.height)
+      } else if (
+        object.geometry instanceof THREE.ConeGeometry &&
+        object.geometry.parameters.radialSegments !== 4
+      ) {
+        properties =
+          '形状: 圆锥体<br>体积: ' +
+          (1 / 3) *
+          Math.PI *
+          Math.pow(object.geometry.parameters.radius, 2) *
+          object.geometry.parameters.height +
+          '<br>表面积: ' +
+          Math.PI *
+          object.geometry.parameters.radius *
+          (object.geometry.parameters.radius +
+            Math.sqrt(
+              Math.pow(object.geometry.parameters.height, 2) +
+              Math.pow(object.geometry.parameters.radius, 2)
+            ))
+      } else if (object.geometry instanceof THREE.TorusGeometry) {
+        properties =
+          '形状: 圆环体<br>体积: ' +
+          2 *
+          Math.PI *
+          Math.PI *
+          Math.pow(object.geometry.parameters.radius, 2) *
+          object.geometry.parameters.tube +
+          '<br>表面积: ' +
+          4 *
+          Math.PI *
+          Math.PI *
+          object.geometry.parameters.radius *
+          object.geometry.parameters.tube
+      } else if (
+        object.geometry instanceof THREE.SphereGeometry &&
+        object.geometry.scale.y !== 1
+      ) {
+        properties =
+          '形状: 椭球体<br>体积: ' +
+          (4 / 3) *
+          Math.PI *
+          object.geometry.parameters.radius *
+          object.geometry.parameters.radius *
+          object.geometry.parameters.radius *
+          object.geometry.scale.y +
+          '<br>表面积: 近似值'
+      }
+
+      info.innerHTML = properties
+    }
+
+    // 动态变化
+    function animateShape(shape) {
+      const initialScale = shape.scale.clone()
+      const targetScale = new THREE.Vector3(2, 2, 2)
+      const duration = 1000 // 动画持续时间（毫秒）
+      const startTime = performance.now()
+
+      function animate() {
+        const elapsedTime = performance.now() - startTime
+        const progress = Math.min(elapsedTime / duration, 1)
+
+        shape.scale.lerpVectors(initialScale, targetScale, progress)
+
+        if (progress < 1) {
+          requestAnimationFrame(animate)
+        }
+      }
+      animate()
+    }
+
+    // 渲染循环
+    function animate() {
+      requestAnimationFrame(animate)
+
+      shapes.forEach((shape) => {
+        if (autoRotate) {
+          shape.rotation.y += 0.01
+          shape.rotation.x += 0.01
+        }
+      })
+
+      particlesMesh.rotation.y += 0.002
+
+      renderer.render(scene, camera)
+    }
+    animate()
+
+    // 调整窗口大小时更新渲染器和相机
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+    })
+
+    // 初始化时添加一个形状并进行动态变化
+    createShape('cube', 1)
+    animateShape(shapes[0])
+
+    // 点击按钮时添加形状并进行动态变化
+    document.getElementById('addShape').addEventListener('click', () => {
+      const shape = document.getElementById('shape').value
+      const size = parseFloat(document.getElementById('size').value)
+      createShape(shape, size)
+      animateShape(shapes[shapes.length - 1])
+    })
+  </script>
+</body>
+
+</html>

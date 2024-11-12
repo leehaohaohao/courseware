@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Triangular Pyramid with Interactive Helper Lines</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!--  <script src="../javascript/plotly/plotly-latest.min.js"></script>-->
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #f0f0f0;
+    }
+
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+    }
+
+    #controls input,
+    #controls button {
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="controls"></div>
+  <div id="plotly-div" style="width: 100vw; height: 100vh"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const plotlyDiv = document.getElementById('plotly-div')
+      let isAddingLine = false
+      let helperLines = []
+      let startPoint = null
+
+      const pyramidVertices = {
+        x: [0, -1, 1, 0],
+        y: [1, -1, -1, -1],
+        z: [0, 1, 1, -1]
+      }
+
+      const pyramidFaces = {
+        i: [0, 0, 0, 1],
+        j: [1, 2, 3, 2],
+        k: [2, 3, 1, 3]
+      }
+
+      const pyramid = {
+        type: 'mesh3d',
+        x: pyramidVertices.x,
+        y: pyramidVertices.y,
+        z: pyramidVertices.z,
+        i: pyramidFaces.i,
+        j: pyramidFaces.j,
+        k: pyramidFaces.k,
+        opacity: 0.5,
+        color: 'green'
+      }
+
+      function drawPlot() {
+        const data = [pyramid, ...helperLines]
+        const layout = {
+          scene: {
+            xaxis: { range: [-2, 2] },
+            yaxis: { range: [-2, 2] },
+            zaxis: { range: [-2, 2] }
+          }
+        }
+        Plotly.newPlot(plotlyDiv, data, layout)
+      }
+
+      drawPlot()
+
+      plotlyDiv.on('plotly_click', function (data) {
+        if (isAddingLine) {
+          const point = data.points[0]
+          const x = point.x
+          const y = point.y
+          const z = point.z
+
+          if (!startPoint) {
+            startPoint = { x, y, z }
+          } else {
+            const endPoint = { x, y, z }
+            const line = {
+              type: 'scatter3d',
+              mode: 'lines',
+              x: [startPoint.x, endPoint.x],
+              y: [startPoint.y, endPoint.y],
+              z: [startPoint.z, endPoint.z],
+              line: { color: 'blue', width: 2 }
+            }
+            helperLines.push(line)
+            startPoint = null
+            drawPlot()
+          }
+        }
+      })
+
+      document.getElementById('addLineMode').addEventListener('click', function () {
+        isAddingLine = true
+      })
+
+      document.getElementById('dragMode').addEventListener('click', function () {
+        isAddingLine = false
+      })
+
+      document.getElementById('undoLine').addEventListener('click', function () {
+        if (helperLines.length > 0) {
+          helperLines.pop()
+          drawPlot()
+        }
+      })
+
+      document.getElementById('clearLines').addEventListener('click', function () {
+        helperLines = []
+        drawPlot()
+      })
+    })
+  </script>
+</body>
+
+</html>

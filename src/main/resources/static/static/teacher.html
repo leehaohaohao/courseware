@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>共享桌面</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+
+    button {
+      padding: 5px 10px;
+      border-radius: 8px;
+      color: rgb(64, 158, 255);
+      background: #fff;
+      border: rgb(64, 158, 255) 1px solid;
+      cursor: pointer;
+    }
+
+    .status {
+      margin-top: 20px;
+      color: #666;
+    }
+
+    video {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="start" disabled>开始共享</button>
+  <button id="switch" disabled>切换共享屏幕</button>
+  <video id="localVideo" autoplay muted></video>
+  <script>
+    let ws;
+    let peerConnection;
+    let screenStream;
+    const token = localStorage.getItem('token') || '1826499085890486272';
+
+    function connectWebSocket() {
+      ws = new WebSocket('ws://121.40.154.188:10002/ws')
+      // ws = new WebSocket('ws://localhost:10002/ws');
+
+
+      ws.onopen = () => {
+        ws.send(token);
+        document.getElementById('start').disabled = false;
+        document.getElementById('switch').disabled = false;
+      };
+
+      ws.onmessage = async (message) => {
+        const data = JSON.parse(message.data);
+        if (data.type === 'answer') {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        } else if (data.type === 'candidate') {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      };
+    }
+
+    async function startSharing() {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      document.getElementById('localVideo').srcObject = screenStream;
+      peerConnection = new RTCPeerConnection();
+      screenStream.getTracks().forEach(track => peerConnection.addTrack(track, screenStream));
+
+      peerConnection.onicecandidate = event => {
+        if (event.candidate && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
+        }
+      };
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'offer', offer: offer }));
+      }
+    }
+
+    window.onload = () => {
+      document.getElementById('start').onclick = startSharing;
+
+      document.getElementById('switch').onclick = async () => {
+        if (screenStream) {
+          screenStream.getTracks().forEach(track => track.stop());
+        }
+        await startSharing();
+      };
+
+      connectWebSocket();
+    };
+  </script>
+</body>
+
+</html>

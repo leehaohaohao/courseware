@@ -1,7 +1,7 @@
 file:
   load:
     #path: C:/gm/Tomcat/apache-tomcat-10.1.20/webapps/courseware/
-    #path: /tools/courseware/model/img/
+    path: /tools/courseware/model/img/
 #url: http://localhost:8080/courseware/
 url: http://121.40.154.188:8080/courseware/img/
 img:
