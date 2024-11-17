@@ -43,6 +43,9 @@ spring:
         options:
           model: gpt-3.5-turbo
           temperature: 0.3F
+  web:
+    resources:
+      static-locations: file:/app/static/
 logging:
   level:
     root: info
