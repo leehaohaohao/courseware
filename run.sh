@@ -12,7 +12,7 @@ CONTAINER_PORT_WS=10002
 docker stop $CONTAINER_NAME
 docker rm $CONTAINER_NAME
 # 构建 Docker 镜像（如果需要）
-docker build -t $IMAGE_NAME .
+docker build -t $IMAGE_NAME .Do
 # 启动 Docker 容器，并挂载宿主机的上传目录，同时映射多个端口
 docker run -d \
   -p $HOST_PORT_HTTP:$CONTAINER_PORT_HTTP \

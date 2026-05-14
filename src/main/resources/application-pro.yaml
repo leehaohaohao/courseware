@@ -1,6 +1,6 @@
 file:
   load:
     path: ./model/
-url: http://localhost:8080/courseware/
+url: http://localhost:10001/courseware/
 img:
   path: ./model/img

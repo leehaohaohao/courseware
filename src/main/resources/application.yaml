@@ -38,7 +38,7 @@ spring:
   ai:
     openai:
       api-key: sk-l0VCv1A4zjjUqXdnwesKlxZNdS6PCKMIgqVaKPztdYgasY5O
-      base-url: https://api.chatanywhere.com.cn
+      base-url: https://api.chatanywhere.tech
       chat:
         options:
           model: gpt-3.5-turbo

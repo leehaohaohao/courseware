@@ -6,10 +6,7 @@ import com.lihao.courseware.entity.dto.ResponsePack;
 import com.lihao.courseware.service.KnowledgeBaseService;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,4 +31,6 @@ public class AIController extends BaseController {
     public ResponsePack chat(String msg) {
         return getSuccessResponse(knowledgeBaseService.search(msg));
     }
+
+
 }

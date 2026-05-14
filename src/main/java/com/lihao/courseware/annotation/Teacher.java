@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Teacher {
-    boolean isTeacher() default true;
+    boolean isTeacher() default false;
 }

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Responsive p5.js Sketch</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: white;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<!--  <script src="../javascript/p5/p5.js"></script>-->
+</head>
+
+<body>
+  <script>
+    let agents = []
+    let sides = 'FRONT BACK TOP BOTTOM LEFT RIGHT'.split(' ')
+    let directions = 'UP RIGHT DOWN LEFT'.split(' ')
+    let adjacencies = {
+      FRONT: 'TOP RIGHT BOTTOM LEFT'.split(' '),
+      RIGHT: 'TOP BACK BOTTOM FRONT'.split(' '),
+      BACK: 'TOP LEFT BOTTOM RIGHT'.split(' '),
+      LEFT: 'TOP FRONT BOTTOM BACK'.split(' '),
+      TOP: 'BACK RIGHT FRONT LEFT'.split(' '),
+      BOTTOM: 'FRONT RIGHT BACK LEFT'.split(' ')
+    }
+    let rotations = {
+      FRONT: [0, 0, 0, 0],
+      RIGHT: [270, 0, 90, 0],
+      BACK: [180, 0, 180, 0],
+      LEFT: [90, 0, 270, 0],
+      TOP: [180, 90, 0, 270],
+      BOTTOM: [0, 270, 180, 90]
+    }
+    let numAgents = 100
+    let cubeSize = 200
+    let nSegments = 10
+    let minWidth = 1
+    let maxWidth = 3
+    let minSpeed = 2.5
+    let maxSpeed = 10
+
+    class Agent {
+      constructor(size = cubeSize) {
+        this.size = size
+        this.positions = [
+          [random(-size / 2, size / 2), random(-size / 2, size / 2), random(sides)]
+        ]
+        this.direction = random(directions)
+        this.speed = random(minSpeed, maxSpeed)
+        this.nSegments = nSegments
+        this.wChance = 0.01
+        this.width = random(minWidth, maxWidth)
+      }
+
+      update() {
+        if (random() < this.wChance) {
+          let d = directions.indexOf(this.direction)
+          if (random() < 0.5) {
+            this.direction = directions[(d + 1) % 4]
+          } else {
+            this.direction = directions[(d + 3) % 4]
+          }
+        }
+        let lastPos = this.positions[this.positions.length - 1]
+        let newPos
+        switch (this.direction) {
+          case 'UP':
+            newPos = [lastPos[0], lastPos[1] - this.speed, lastPos[2]]
+            break
+          case 'DOWN':
+            newPos = [lastPos[0], lastPos[1] + this.speed, lastPos[2]]
+            break
+          case 'LEFT':
+            newPos = [lastPos[0] - this.speed, lastPos[1], lastPos[2]]
+            break
+          case 'RIGHT':
+            newPos = [lastPos[0] + this.speed, lastPos[1], lastPos[2]]
+            break
+        }
+        let breakPosition = this._breakPosition(lastPos, newPos)
+        if (breakPosition) {
+          this.positions.push(...breakPosition)
+        } else {
+          this.positions.push(newPos)
+        }
+        if (this.positions.length > this.nSegments) {
+          this.positions = this.positions.slice(-this.nSegments)
+        }
+      }
+
+      draw() {
+        for (let i = 0; i < this.positions.length - 1; i++) {
+          if (this.positions[i][2] === this.positions[i + 1][2]) {
+            push()
+            let x1 = this.positions[i][0]
+            let y1 = this.positions[i][1]
+            let x2 = this.positions[i + 1][0]
+            let y2 = this.positions[i + 1][1]
+
+            this._transform(this.positions[i][2])()
+            noStroke()
+            fill(map(i, 0, this.positions.length, 255, 0))
+
+            let r =
+              x1 === x2 // Horizontal
+                ? [this.width, abs(y2 - y1)]
+                : [abs(x2 - x1), this.width]
+            rect((x1 + x2) / 2, (y1 + y2) / 2, ...r)
+            pop()
+          }
+        }
+      }
+
+      _transform(side) {
+        let s = this.size
+        switch (side) {
+          case 'FRONT':
+            return () => {
+              translate(0, 0, s / 2)
+            }
+          case 'BACK':
+            return () => {
+              translate(0, 0, -s / 2)
+              rotateY(180)
+            }
+          case 'TOP':
+            return () => {
+              translate(0, -s / 2, 0)
+              rotateX(90)
+            }
+          case 'BOTTOM':
+            return () => {
+              translate(0, s / 2, 0)
+              rotateX(-90)
+            }
+          case 'RIGHT':
+            return () => {
+              translate(s / 2, 0, 0)
+              rotateY(90)
+            }
+          case 'LEFT':
+            return () => {
+              translate(-s / 2, 0, 0)
+              rotateY(-90)
+            }
+        }
+      }
+
+      _rotatePoints(angle, ...coords) {
+        return coords.map((coord) => {
+          const angleInDegrees = angle % 360
+          let [x, y, side] = coord
+          if (angleInDegrees === 90) {
+            return [-y, x, side]
+          } else if (angleInDegrees === 180) {
+            return [-x, -y, side]
+          } else if (angleInDegrees === 270) {
+            return [y, -x, side]
+          } else {
+            return [x, y, side]
+          }
+        })
+      }
+
+      _breakPosition(lastPos, newPos) {
+        let s = this.size / 2
+        let rotationAngle
+        let p
+        if (newPos[0] < -s) {
+          rotationAngle = rotations[lastPos[2]][3]
+          p = [
+            [-s, lastPos[1], lastPos[2]],
+            ...this._rotatePoints(
+              rotationAngle,
+              [s, lastPos[1], adjacencies[lastPos[2]][3]],
+              [2 * s + newPos[0], lastPos[1], adjacencies[lastPos[2]][3]]
+            )
+          ]
+        }
+        if (newPos[0] > s) {
+          rotationAngle = rotations[lastPos[2]][1]
+          p = [
+            [s, lastPos[1], lastPos[2]],
+            ...this._rotatePoints(
+              rotationAngle,
+              [-s, lastPos[1], adjacencies[lastPos[2]][1]],
+              [this.speed + lastPos[0] + 2 * -s, lastPos[1], adjacencies[lastPos[2]][1]]
+            )
+          ]
+        }
+        if (newPos[1] < -s) {
+          rotationAngle = rotations[lastPos[2]][0]
+          p = [
+            [lastPos[0], -s, lastPos[2]],
+            ...this._rotatePoints(
+              rotationAngle,
+              [lastPos[0], s, adjacencies[lastPos[2]][0]],
+              [lastPos[0], 2 * s + newPos[1], adjacencies[lastPos[2]][0]]
+            )
+          ]
+        }
+        if (newPos[1] > s) {
+          rotationAngle = rotations[lastPos[2]][2]
+          p = [
+            [lastPos[0], s, lastPos[2]],
+            ...this._rotatePoints(
+              rotationAngle,
+              [lastPos[0], -s, adjacencies[lastPos[2]][2]],
+              [lastPos[0], this.speed + lastPos[1] + 2 * -s, adjacencies[lastPos[2]][2]]
+            )
+          ]
+        }
+        if (p) {
+          let s = directions.indexOf(this.direction)
+          this.direction = directions[(s + rotationAngle / 90) % 4]
+          return p
+        }
+      }
+    }
+
+    function setup() {
+      createCanvas(500, 500, WEBGL)
+      background(255)
+      rectMode(CENTER)
+      angleMode(DEGREES)
+      for (let i = 0; i < numAgents; i++) {
+        let agent = new Agent()
+        agents.push(agent)
+      }
+    }
+
+    function draw() {
+      background(255)
+      orbitControl()
+      rotateY(-0.2 * frameCount)
+      rotateZ(-0.1 * frameCount)
+      rotateX(-0.1 * frameCount)
+      for (let agent of agents) {
+        agent.update()
+        agent.draw()
+      }
+      debugCube()
+    }
+
+    let showCube = true
+
+    function debugCube() {
+      if (!showCube) {
+        return
+      }
+      let s = cubeSize
+      let agent = agents[0]
+      for (let side of sides) {
+        push()
+        noFill()
+        agent._transform(side)()
+
+        let startColor = color(0, 0, 0) // 黑色
+        let endColor = color(180, 180, 180) // 灰色
+        let c = lerpColor(startColor, endColor, 5)
+        stroke(c)
+        strokeWeight(3)
+        rect(0, 0, s, s)
+        pop()
+      }
+    }
+
+    function keyPressed() {
+      if (keyCode === 32) {
+        // Space
+        showCube = !showCube
+      }
+    }
+  </script>
+</body>
+
+</html>

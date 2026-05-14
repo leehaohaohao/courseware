@@ -16,4 +16,5 @@ public class ResponsePack<T> {
      * 请求失败的条件下返回的错误信息（对用户操作错误的提示，如账号密码错误等）
      */
     private String error;
+ 
 }

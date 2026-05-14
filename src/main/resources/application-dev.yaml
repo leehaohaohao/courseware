@@ -2,8 +2,8 @@ file:
   load:
     #path: C:/gm/Tomcat/apache-tomcat-10.1.20/webapps/courseware/
     path: /app/static/upload/img/
-#url: http://localhost:8080/courseware/
-url: http://121.40.154.188:10001/courseware/upload/img/
+#url: http://localhost:10001/courseware/
+url: http://121.40.154.188:10001/courseware/
 img:
   #path: C:/gm/Tomcat/apache-tomcat-10.1.20/webapps/courseware/char.html
   path: /app/static/upload/char.html

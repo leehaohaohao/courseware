@@ -4,6 +4,7 @@ import com.lihao.courseware.annotation.Time;
 import com.lihao.courseware.api.aliyun.BaiDu;
 import com.lihao.courseware.config.AppConfig;
 import com.lihao.courseware.entity.dto.ResponsePack;
+import com.lihao.courseware.entity.po.AudioReq;
 import com.lihao.courseware.handler.ProgressWebSocketHandler;
 import com.lihao.courseware.service.FileService;
 import com.lihao.courseware.util.CommonTools;
@@ -11,10 +12,7 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -58,7 +56,7 @@ public class ChartController extends BaseController {
             ProgressWebSocketHandler.sendProgress(htmlPath);
         });
         //TODO
-        return getSuccessResponse(baseUrl + fileName);
+        return getSuccessResponse(baseUrl +"upload/img/" +fileName);
         //return getSuccessResponse("http://121.40.154.188:8080/courseware/img/"+fileName);
     }
 
@@ -72,5 +70,19 @@ public class ChartController extends BaseController {
         return getSuccessResponse(baseUrl + fileName);
         //TODO
         //return getSuccessResponse("http://121.40.154.188:8080/img/"+fileName);
+    }
+
+    @PostMapping("/audio")
+    public ResponsePack audio(@RequestBody AudioReq req) {
+        String base64 = req.getAudioBase64();
+        // 去掉前缀
+        if (base64.startsWith("data:")) {
+            int index = base64.indexOf(",");
+            if (index != -1) {
+                base64 = base64.substring(index + 1);
+            }
+        }
+        String text = baiDu.baiduAsrM4aBase64(base64);
+        return getSuccessResponse(text); // 只返回识别文本
     }
 }

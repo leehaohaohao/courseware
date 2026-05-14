@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three-dimensional Geometric Model</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body style="height: 100vh; width: 100vw;">
+    <div id="3d-plot"></div>
+
+    <script>
+        var data = [
+            {
+                type: 'scatter3d',
+                mode: 'markers',
+                x: [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
+                y: [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4],
+                z: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                marker: {
+                    size: 10,
+                    color: ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta', 'teal', 'lime', 'brown', 'maroon', 'navy']
+                }
+            }
+        ];
+
+        var layout = {
+            margin: {
+                l: 0,
+                r: 0,
+                b: 0,
+                t: 0
+            }
+        };
+
+        Plotly.newPlot('3d-plot', data, layout);
+    </script>
+</body>
+</html>
